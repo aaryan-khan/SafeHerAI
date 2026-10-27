@@ -1,0 +1,50 @@
+# ---------- Secrets & environment (NEVER commit) ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+service-account*.json
+
+# ---------- macOS / editors ----------
+.DS_Store
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+
+# ---------- Java / Maven (backend) ----------
+backend/target/
+*.class
+*.log
+hs_err_pid*
+
+# ---------- Node / Expo (mobile) ----------
+node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+mobile/android/
+mobile/ios/
+npm-debug.log*
+*.tsbuildinfo
+
+# ---------- Python (ai-service) ----------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+ai-service/data/
+ai-service/models/
+
+# ---------- Docker / local data ----------
+infra/volumes/
+*.dump
+*.sql.gz
