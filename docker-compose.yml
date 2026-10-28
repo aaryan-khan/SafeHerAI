@@ -1,0 +1,27 @@
+# Local development services for SafeHerAI.
+# Values come from the repo-root .env file (gitignored). See .env.example.
+services:
+  db:
+    # Official PostGIS image. It is published for Intel (amd64) only, so on
+    # Apple Silicon Docker Desktop runs it through Rosetta emulation.
+    image: postgis/postgis:17-3.5
+    platform: linux/amd64
+    container_name: safeherai-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      # Bind to localhost only, so other devices on your Wi-Fi can't reach the DB.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - safeherai-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  safeherai-db-data:
