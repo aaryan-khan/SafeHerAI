@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: safeherai-backend
+
+  # Read local secrets from the repo-root .env file (gitignored).
+  # "optional:" means the app still starts in CI/tests where no .env exists.
+  config:
+    import: "optional:file:../.env[.properties]"
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  jpa:
+    # Flyway owns the schema; Hibernate only checks that entities match it.
+    hibernate:
+      ddl-auto: validate
+    # Don't keep DB connections open while rendering responses.
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+server:
+  # Never send stack traces or exception messages to clients.
+  error:
+    include-stacktrace: never
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Only the health endpoint is public. Nothing else from Actuator.
+        include: health
+  endpoint:
+    health:
+      # Say UP/DOWN only. Don't reveal database details.
+      show-details: never
