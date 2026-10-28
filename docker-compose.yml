@@ -14,7 +14,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
       # Bind to localhost only, so other devices on your Wi-Fi can't reach the DB.
-      - "127.0.0.1:5432:5432"
+      - 127.0.0.1:${DB_PORT:-5432}:5432
     volumes:
       - safeherai-db-data:/var/lib/postgresql/data
     healthcheck:
