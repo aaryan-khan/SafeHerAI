@@ -3,23 +3,14 @@ package com.safeherai.backend;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-@SpringBootTest
-@Import(TestcontainersConfiguration.class)
-class DatabaseIntegrationTest {
-
-    @Autowired
-    JdbcTemplate jdbc;
+class DatabaseIntegrationTest extends IntegrationTest {
 
     @Test
-    void flywayAppliedMigrationV1() {
-        Boolean success = jdbc.queryForObject(
-                "SELECT success FROM flyway_schema_history WHERE version = '1'", Boolean.class);
-        assertThat(success).isTrue();
+    void flywayAppliedAllMigrations() {
+        Integer applied = jdbc.queryForObject(
+                "SELECT count(*) FROM flyway_schema_history WHERE success AND version IN ('1', '2')", Integer.class);
+        assertThat(applied).isEqualTo(2);
     }
 
     @Test

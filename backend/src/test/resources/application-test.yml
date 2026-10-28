@@ -1,0 +1,16 @@
+# Settings used only by automated tests (activated with @ActiveProfiles("test")).
+safeherai:
+  security:
+    jwt:
+      # A fresh random secret for every test run, so no secret is ever stored in the repo.
+      secret: ${random.uuid}${random.uuid}
+  rate-limit:
+    login:
+      capacity: 5
+      period: 1m
+    register:
+      capacity: 5
+      period: 1m
+    refresh:
+      capacity: 5
+      period: 1m

@@ -5,22 +5,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
-class HealthEndpointTest {
-
-    @Autowired
-    MockMvc mockMvc;
+class HealthEndpointTest extends IntegrationTest {
 
     @Test
-    void healthIsUpAndHidesDetails() throws Exception {
+    void healthIsPublicUpAndHidesDetails() throws Exception {
         mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
@@ -29,8 +18,9 @@ class HealthEndpointTest {
     }
 
     @Test
-    void otherActuatorEndpointsAreNotExposed() throws Exception {
-        mockMvc.perform(get("/actuator/env")).andExpect(status().isNotFound());
-        mockMvc.perform(get("/actuator/beans")).andExpect(status().isNotFound());
+    void otherActuatorEndpointsAreNotReachable() throws Exception {
+        // Not exposed at all; without a token, security answers 401 before reaching them.
+        mockMvc.perform(get("/actuator/env")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/actuator/beans")).andExpect(status().isUnauthorized());
     }
 }

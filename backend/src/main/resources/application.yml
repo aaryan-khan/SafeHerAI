@@ -38,3 +38,23 @@ management:
     health:
       # Say UP/DOWN only. Don't reveal database details.
       show-details: never
+
+safeherai:
+  security:
+    jwt:
+      # Comes from JWT_SECRET in the repo-root .env file. The app refuses to start without it.
+      secret: ${JWT_SECRET}
+      issuer: safeherai-backend
+      access-token-ttl: 15m
+      refresh-token-ttl: 14d
+  # Per-IP limits for the public auth endpoints.
+  rate-limit:
+    login:
+      capacity: 10
+      period: 1m
+    register:
+      capacity: 5
+      period: 1h
+    refresh:
+      capacity: 30
+      period: 1m
