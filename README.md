@@ -24,8 +24,8 @@ trusted contacts, Safe Walk journey sharing, and an emergency SOS workflow.
 | # | Milestone | Status |
 |---|---|---|
 | M0 | Environment & repository setup | ✅ Done |
-| M1 | Backend skeleton & database | ⏳ Not started |
-| M2 | Authentication | ⏳ Not started |
+| M1 | Backend skeleton & database | ✅ Done |
+| M2 | Authentication | ✅ Done |
 | M3 | Mobile shell & auth screens | ⏳ Not started |
 | M4 | Map & incidents (read) | ⏳ Not started |
 | M5 | Reporting & moderation | ⏳ Not started |
