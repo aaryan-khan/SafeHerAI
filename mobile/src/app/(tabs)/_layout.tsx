@@ -17,11 +17,10 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.textSubtle,
+        // No fixed height: the tab bar adds Android's navigation-bar space by itself.
         tabBarStyle: {
           backgroundColor: theme.colors.backgroundDeep,
           borderTopColor: theme.colors.border,
-          height: 64,
-          paddingTop: 6,
         },
         tabBarLabelStyle: { fontFamily: theme.fonts.medium, fontSize: 12 },
         sceneStyle: { backgroundColor: theme.colors.background },

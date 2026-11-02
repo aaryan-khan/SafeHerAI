@@ -137,7 +137,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, minHeight: 32 },
   section: { gap: theme.spacing.sm },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.xs },
+  sectionHeader: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', 
+  justifyContent: 'space-between', gap: theme.spacing.xs },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
   tile: {
     flexGrow: 1,
