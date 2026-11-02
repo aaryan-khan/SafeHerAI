@@ -26,10 +26,12 @@ type StatusPillProps = {
   tone?: StatusTone;
   /** A gently pulsing dot for things happening right now (e.g. "Live", "Sharing location"). */
   live?: boolean;
+  /** Where the pill sits when it is inside a column. Default: left. */
+  align?: 'start' | 'center';
 };
 
 /** A small coloured label such as "Verified", "Unverified", "Offline" or "Live". */
-export function StatusPill({ label, tone = 'neutral', live = false }: StatusPillProps) {
+export function StatusPill({ label, tone = 'neutral', live = false, align = 'start' }: StatusPillProps) {
   const { fg, bg } = toneColors[tone];
   const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(1);
@@ -43,7 +45,10 @@ export function StatusPill({ label, tone = 'neutral', live = false }: StatusPill
   const dotStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
   return (
-    <View style={[styles.pill, { backgroundColor: bg }]} accessible accessibilityLabel={label}>
+    <View
+      style={[styles.pill, { backgroundColor: bg, alignSelf: align === 'center' ? 'center' : 'flex-start' }]}
+      accessible
+      accessibilityLabel={label}>
       <Animated.View style={[styles.dot, { backgroundColor: fg }, dotStyle]} />
       <Text variant="label" style={{ color: fg }}>
         {label}
@@ -54,7 +59,6 @@ export function StatusPill({ label, tone = 'neutral', live = false }: StatusPill
 
 const styles = StyleSheet.create({
   pill: {
-    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,

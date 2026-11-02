@@ -69,11 +69,12 @@ function RootNavigator() {
         contentStyle: { backgroundColor: theme.colors.background },
         animation: 'slide_from_right',
       }}>
-      <Stack.Protected guard={signedIn}>
-        {/* Home keeps its header until it is redesigned in R3. */}
-        <Stack.Screen name="home" options={{ headerShown: true, title: 'SafeHerAI' }} />
+      {/* redirectTo: where to send someone who opens a screen they can't use right now. */}
+      <Stack.Protected guard={signedIn} redirectTo="/">
+        <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+        <Stack.Screen name="edit-profile" />
       </Stack.Protected>
-      <Stack.Protected guard={!signedIn}>
+      <Stack.Protected guard={!signedIn} redirectTo="/home">
         <Stack.Screen name="index" options={{ animation: 'fade' }} />
         <Stack.Screen name="login" />
         <Stack.Screen name="register" />

@@ -7,6 +7,7 @@ export { Card } from './Card';
 export { EmptyState } from './EmptyState';
 export { useAppFonts } from './fonts';
 export { Icon, type IconName } from './Icon';
+export { ListItem } from './ListItem';
 export { Logo, LogoMark } from './Logo';
 export { PasswordMeter } from './PasswordMeter';
 export { Screen } from './Screen';

@@ -25,6 +25,15 @@ function checkEmail(email: string): string | undefined {
   return undefined;
 }
 
+/** Returns an error message, or undefined if the display name is fine. Used by Register and Edit profile. */
+export function validateDisplayName(displayName: string): string | undefined {
+  const name = displayName.trim();
+  if (!name) return 'Please enter a display name.';
+  if (name.length > DISPLAY_NAME_MAX) return `Display name can be at most ${DISPLAY_NAME_MAX} characters.`;
+  if (!DISPLAY_NAME_PATTERN.test(name)) return "Use only letters, numbers, spaces and . ' _ -";
+  return undefined;
+}
+
 export function validateLogin(input: { email: string; password: string }): FieldErrors<'email' | 'password'> {
   const errors: FieldErrors<'email' | 'password'> = {};
   const email = checkEmail(input.email);
@@ -40,14 +49,8 @@ export function validateRegister(input: {
 }): FieldErrors<'email' | 'password' | 'displayName'> {
   const errors: FieldErrors<'email' | 'password' | 'displayName'> = {};
 
-  const name = input.displayName.trim();
-  if (!name) {
-    errors.displayName = 'Please enter a display name.';
-  } else if (name.length > DISPLAY_NAME_MAX) {
-    errors.displayName = `Display name can be at most ${DISPLAY_NAME_MAX} characters.`;
-  } else if (!DISPLAY_NAME_PATTERN.test(name)) {
-    errors.displayName = "Use only letters, numbers, spaces and . ' _ -";
-  }
+  const displayName = validateDisplayName(input.displayName);
+  if (displayName) errors.displayName = displayName;
 
   const email = checkEmail(input.email);
   if (email) errors.email = email;

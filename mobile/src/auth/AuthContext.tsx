@@ -21,6 +21,7 @@ type AuthContextValue = {
   register(email: string, password: string, displayName: string): Promise<void>;
   logout(): Promise<void>;
   reloadProfile(): Promise<void>;
+  updateDisplayName(displayName: string): Promise<void>;
   retry(): Promise<void>;
 };
 
@@ -78,6 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       async reloadProfile() {
         const user = await api.me();
+        setState({ status: 'signedIn', user });
+      },
+      async updateDisplayName(displayName) {
+        const user = await api.updateDisplayName(displayName.trim());
         setState({ status: 'signedIn', user });
       },
       retry: restore,
