@@ -4,6 +4,8 @@ safeherai:
     jwt:
       # A fresh random secret for every test run, so no secret is ever stored in the repo.
       secret: ${random.uuid}${random.uuid}
+  map:
+    include-demo-data: true
   rate-limit:
     login:
       capacity: 5
@@ -13,4 +15,7 @@ safeherai:
       period: 1m
     refresh:
       capacity: 5
+      period: 1m
+    map-query:
+      capacity: 10
       period: 1m

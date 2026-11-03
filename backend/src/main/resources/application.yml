@@ -47,7 +47,11 @@ safeherai:
       issuer: safeherai-backend
       access-token-ttl: 15m
       refresh-token-ttl: 14d
-  # Per-IP limits for the public auth endpoints.
+  map:
+    # Show made-up DEMO incidents on the map? Safe default: no.
+    # Set INCLUDE_DEMO_DATA=true in .env on your own computer only.
+    include-demo-data: ${INCLUDE_DEMO_DATA:false}
+  # Per-IP limits for the public auth endpoints and map queries.
   rate-limit:
     login:
       capacity: 10
@@ -57,4 +61,8 @@ safeherai:
       period: 1h
     refresh:
       capacity: 30
+      period: 1m
+    # Each pan/zoom of the map is one request, so this is generous.
+    map-query:
+      capacity: 120
       period: 1m

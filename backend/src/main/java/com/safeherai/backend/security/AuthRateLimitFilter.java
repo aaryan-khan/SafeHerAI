@@ -17,7 +17,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Slows down password guessing and mass sign-ups by limiting how often one IP address
- * may call the public auth endpoints. Other endpoints are not affected.
+ * may call the public auth endpoints. Since Milestone 4 it also limits map queries,
+ * so one client can't download every incident by scrolling a script over the map.
+ * Other endpoints are not affected.
  *
  * Limits are kept in memory, so they reset when the app restarts and are not shared
  * between multiple servers. That is fine for now; we revisit it before deployment.
@@ -35,21 +37,27 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
             .build();
 
     public AuthRateLimitFilter(RateLimitProperties props) {
+        // Keys are "METHOD path".
         this.limitsByPath = Map.of(
-                "/api/v1/auth/login", props.login(),
-                "/api/v1/auth/register", props.register(),
-                "/api/v1/auth/refresh", props.refresh());
+                "POST /api/v1/auth/login", props.login(),
+                "POST /api/v1/auth/register", props.register(),
+                "POST /api/v1/auth/refresh", props.refresh(),
+                "GET /api/v1/incidents", props.mapQuery());
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !"POST".equals(request.getMethod()) || !limitsByPath.containsKey(request.getRequestURI());
+        return !limitsByPath.containsKey(endpoint(request));
+    }
+
+    private static String endpoint(HttpServletRequest request) {
+        return request.getMethod() + " " + request.getRequestURI();
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String path = request.getRequestURI();
+        String path = endpoint(request);
         // getRemoteAddr() is the real connecting address. We deliberately ignore X-Forwarded-For,
         // which clients can fake. (Behind a proxy in production we'll configure this properly.)
         String key = path + "|" + request.getRemoteAddr();
