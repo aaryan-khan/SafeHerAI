@@ -34,6 +34,7 @@ export const colors = {
   surface: palette.surface,
   surfaceRaised: palette.surfaceRaised,
   surfaceGlass: 'rgba(255, 255, 255, 0.06)',
+  surfaceOverlay: 'rgba(11, 16, 38, 0.94)',
   border: 'rgba(255, 255, 255, 0.10)',
   borderStrong: 'rgba(255, 255, 255, 0.20)',
 

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ApiError, createApiClient, type User } from '@/api/client';
+import type { IncidentPage, MapArea } from '@/api/incidents';
 import { secureTokenStore } from '@/auth/tokenStorage';
 import { API_URL } from '@/config/env';
 
@@ -23,6 +24,8 @@ type AuthContextValue = {
   reloadProfile(): Promise<void>;
   updateDisplayName(displayName: string): Promise<void>;
   retry(): Promise<void>;
+  /** Logged-in API calls live here because they share the session's tokens. */
+  incidentsInArea(area: MapArea): Promise<IncidentPage>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -86,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setState({ status: 'signedIn', user });
       },
       retry: restore,
+      incidentsInArea: (area) => api.incidentsInArea(area),
     }),
     [api, restore, state],
   );

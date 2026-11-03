@@ -10,7 +10,6 @@ import { Avatar, Card, Icon, Screen, Skeleton, StatusPill, Text, theme, type Ico
 
 /** Features that are planned but not built yet. Shown clearly as "Coming soon" and not tappable. */
 const UPCOMING: { icon: IconName; title: string }[] = [
-  { icon: 'map', title: 'Safety map' },
   { icon: 'report', title: 'Report incident' },
   { icon: 'group', title: 'Trusted contacts' },
   { icon: 'directions_walk', title: 'Safe Walk' },
@@ -86,7 +85,26 @@ export default function HomeScreen() {
         </Card>
       </Animated.View>
 
-      <Animated.View entering={enter(2)} style={styles.section}>
+      <Animated.View entering={enter(2)}>
+        <Pressable
+          onPress={() => router.push('/map')}
+          accessibilityRole="button"
+          accessibilityLabel="Safety map. See community reports around you"
+          style={({ pressed }) => [styles.mapCard, pressed && styles.pressed]}>
+          <View style={styles.mapIcon}>
+            <Icon name="map" size={26} color={theme.colors.primary} />
+          </View>
+          <View style={styles.flex}>
+            <Text variant="bodyStrong">Safety map</Text>
+            <Text variant="label" color="textMuted">
+              See community reports around you
+            </Text>
+          </View>
+          <Icon name="chevron_right" size={24} color={theme.colors.textSubtle} />
+        </Pressable>
+      </Animated.View>
+
+      <Animated.View entering={enter(3)} style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text variant="subheading">Coming to SafeHerAI</Text>
           <StatusPill label="In development" tone="ai" />
@@ -106,7 +124,7 @@ export default function HomeScreen() {
         </View>
       </Animated.View>
 
-      <Animated.View entering={enter(3)}>
+      <Animated.View entering={enter(4)}>
         <Card>
           <View style={styles.statusRow}>
             <Icon name="lightbulb" size={20} color={theme.colors.warning} />
@@ -118,7 +136,7 @@ export default function HomeScreen() {
         </Card>
       </Animated.View>
 
-      <Animated.View entering={enter(4)} style={styles.emergency} accessible>
+      <Animated.View entering={enter(5)} style={styles.emergency} accessible>
         <Icon name="call" size={20} color={theme.colors.emergencyOrange} />
         <Text variant="label" color="textMuted" style={styles.flex}>
           SafeHerAI is not an emergency service. In an emergency in India, call{' '}
@@ -137,8 +155,27 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, minHeight: 32 },
   section: { gap: theme.spacing.sm },
-  sectionHeader: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', 
-  justifyContent: 'space-between', gap: theme.spacing.xs },
+  mapCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    padding: theme.spacing.md,
+    borderRadius: theme.radii.lg,
+    backgroundColor: theme.colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: 'rgba(124, 92, 255, 0.35)',
+  },
+  mapIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: theme.radii.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primarySoft,
+  },
+  pressed: { opacity: 0.85 },
+  // flexWrap: with large text sizes the pill moves to its own line instead of being cut off.
+  sectionHeader: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: theme.spacing.xs },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm },
   tile: {
     flexGrow: 1,

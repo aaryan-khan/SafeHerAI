@@ -1,3 +1,4 @@
+import { incidentsPath, type IncidentPage, type MapArea } from './incidents';
 /**
  * Talks to the SafeHerAI backend.
  *
@@ -187,6 +188,11 @@ export function createApiClient({
       return authed<User>('/api/v1/users/me', { method: 'PATCH', body: { displayName } });
     },
 
+    /** Incidents inside a rectangle of map, newest first (at most 300). */
+    incidentsInArea(area: MapArea): Promise<IncidentPage> {
+      return authed<IncidentPage>(incidentsPath(area));
+    },
+    
     /**
      * Ends the session. Always forgets the tokens on this phone.
      * Returns false if the server could not be told (it then expires on its own within 14 days).

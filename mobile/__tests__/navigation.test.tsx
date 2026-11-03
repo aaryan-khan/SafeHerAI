@@ -34,6 +34,7 @@ const routes = {
   'edit-profile': () => <Text>EDIT PROFILE</Text>,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/home': () => <Text>HOME</Text>,
+  '(tabs)/map': () => <Text>MAP</Text>,
   '(tabs)/profile': () => <Text>PROFILE</Text>,
 };
 
@@ -54,6 +55,12 @@ describe('navigation between logged-out and logged-in screens', () => {
   it('never shows Home or Profile to a logged-out user', async () => {
     await renderRouter(routes, { initialUrl: '/profile' });
     expect(screen.queryByText('PROFILE')).toBeNull();
+    expect(screen.getByText('WELCOME')).toBeOnTheScreen();
+  });
+
+  it('never shows the map to a logged-out user', async () => {
+    await renderRouter(routes, { initialUrl: '/map' });
+    expect(screen.queryByText('MAP')).toBeNull();
     expect(screen.getByText('WELCOME')).toBeOnTheScreen();
   });
 

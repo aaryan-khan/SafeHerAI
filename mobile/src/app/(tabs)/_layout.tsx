@@ -8,7 +8,7 @@ const tabIcon =
 
 /**
  * The bottom tab bar shown after login.
- * Only features that actually work get a tab; Map, Contacts etc. are added as they are built.
+ * Only features that actually work get a tab; Contacts etc. are added as they are built.
  */
 export default function TabsLayout() {
   return (
@@ -26,6 +26,7 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: theme.colors.background },
       }}>
       <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: tabIcon('home') }} />
+      <Tabs.Screen name="map" options={{ title: 'Map', tabBarIcon: tabIcon('map') }} />
       <Tabs.Screen name="profile" options={{ title: 'Profile', tabBarIcon: tabIcon('person') }} />
     </Tabs>
   );

@@ -43,7 +43,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "SafeHerAI uses your location only while the app is open, to show the map around you. It is not sent to the server.",
+          "locationWhenInUsePermission": "SafeHerAI uses your location only while the app is open, to show the map around you. Your exact position is not sent to the server; it only receives the map area you are viewing.",
           "locationAlwaysAndWhenInUsePermission": false,
           "locationAlwaysPermission": false,
           "isAndroidBackgroundLocationEnabled": false,

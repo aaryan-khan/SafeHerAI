@@ -66,9 +66,19 @@ describe('HomeScreen', () => {
     await render(<HomeScreen />);
     await screen.findByLabelText('Connected');
 
-    expect(screen.getByLabelText('Safety map, coming soon')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: /Safety map/ })).toBeNull();
+    expect(screen.getByLabelText('Report incident, coming soon')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /Report incident/ })).toBeNull();
     expect(screen.getByText(/In an emergency in India, call/)).toHaveTextContent(/112/);
+  });
+
+  it('opens the safety map', async () => {
+    fakeAuth();
+    await render(<HomeScreen />);
+    await screen.findByLabelText('Connected');
+
+    expect(screen.queryByLabelText('Safety map, coming soon')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: /Safety map/ }));
+    expect(router.push).toHaveBeenCalledWith('/map');
   });
 });
 
