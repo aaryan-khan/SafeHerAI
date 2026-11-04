@@ -41,6 +41,7 @@ public class SecurityConfig {
                         // Spring's internal error page must stay reachable, or every error becomes a 401.
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/moderation/**").hasAnyRole("MODERATOR", "ADMIN")
                         // Deny by default: everything else needs a valid access token.
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth

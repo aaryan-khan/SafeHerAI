@@ -33,13 +33,14 @@ points AS (
     FROM generate_series(0, 44) AS g
     JOIN anchors a ON a.n = g % 15
 )
-INSERT INTO incidents (id, category, description, location, occurred_at, verification_status, is_demo)
+INSERT INTO incidents (id, category, description, location, occurred_at, verification_status, is_demo, description_approved)
 SELECT gen_random_uuid(),
        category,
        'DEMO: made-up report for testing the map. Not a real incident.',
        ST_SetSRID(ST_MakePoint(lon, lat), 4326),
        now() - age_roll * interval '60 days',
        CASE WHEN verified_roll < 0.3 THEN 'VERIFIED' ELSE 'UNVERIFIED' END,
+       TRUE,
        TRUE
 FROM points;
 
