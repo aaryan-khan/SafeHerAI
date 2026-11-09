@@ -42,7 +42,8 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
                 "POST /api/v1/auth/login", props.login(),
                 "POST /api/v1/auth/register", props.register(),
                 "POST /api/v1/auth/refresh", props.refresh(),
-                "GET /api/v1/incidents", props.mapQuery());
+                "GET /api/v1/incidents", props.mapQuery(),
+                "GET /api/v1/areas/summary", props.mapQuery());
     }
 
     @Override

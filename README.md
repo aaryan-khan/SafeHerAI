@@ -26,10 +26,10 @@ trusted contacts, Safe Walk journey sharing, and an emergency SOS workflow.
 | M0 | Environment & repository setup | ✅ Done |
 | M1 | Backend skeleton & database | ✅ Done |
 | M2 | Authentication | ✅ Done |
-| M3 | Mobile shell & auth screens | ⏳ Not started |
-| M4 | Map & incidents (read) | ⏳ Not started |
-| M5 | Reporting & moderation | ⏳ Not started |
-| M6 | Area indicators | ⏳ Not started |
+| M3 | Mobile shell & auth screens | ✅ Done |
+| M4 | Map & incidents (read) | ✅ Done |
+| M5 | Reporting & moderation | ✅ Done (moderation via API only) |
+| M6 | Area indicators | 🚧 In progress |
 | M7 | Route comparison | ⏳ Not started |
 | M8 | Trusted contacts & SOS (dry run) | ⏳ Not started |
 | M9 | Safe Walk & notifications | ⏳ Not started |
