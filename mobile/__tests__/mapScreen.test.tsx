@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import * as Location from 'expo-location';
+import { router } from 'expo-router';
 import { ApiError } from '@/api/client';
 import type { Incident, IncidentPage } from '@/api/incidents';
 import { useAuth } from '@/auth/AuthContext';
@@ -18,7 +19,7 @@ jest.mock('@maplibre/maplibre-react-native', () => {
     fake,
     Map: React.forwardRef((props: any, ref: any) => {
       fake.map = props;
-      React.useImperativeHandle(ref, () => ({ getBounds: async () => fake.bounds }));
+      React.useImperativeHandle(ref, () => ({ getBounds: async () => fake.bounds, getCenter: async () => [72.85, 19.05] }));
       return React.createElement(View, { testID: 'map' }, props.children);
     }),
     Camera: React.forwardRef((_props: any, ref: any) => {
@@ -41,6 +42,7 @@ jest.mock('expo-location', () => ({
   getCurrentPositionAsync: jest.fn(),
 }));
 jest.mock('@/auth/AuthContext', () => ({ useAuth: jest.fn() }));
+jest.mock('expo-router', () => ({ router: { push: jest.fn() }, useFocusEffect: jest.fn() }));
 jest.mock('react-native-safe-area-context', () => require('react-native-safe-area-context/jest/mock').default);
 
 const { fake } = jest.requireMock('@maplibre/maplibre-react-native') as { fake: Record<string, any> };
@@ -51,6 +53,7 @@ function incident(overrides: Partial<Incident> = {}): Incident {
     id: 'i1',
     category: 'POOR_LIGHTING',
     description: 'DEMO: made-up report for testing the map. Not a real incident.',
+    descriptionPending: false,
     latitude: 19.05,
     longitude: 72.85,
     occurredAt: new Date(Date.now() - 2 * 3_600_000).toISOString(),
@@ -166,6 +169,31 @@ describe('MapScreen: reports', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Close details' }));
     expect(screen.queryByText('Poor lighting')).toBeNull();
     expect(screen.getByText(/call/)).toHaveTextContent(/112/);
+  });
+});
+
+describe('MapScreen: reporting', () => {
+  it('opens the report form at the middle of the map', async () => {
+    withServer(jest.fn().mockResolvedValue({ items: [], truncated: false }));
+    await render(<MapScreen />);
+    await mapLoaded();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Report an incident here' }));
+    expect(router.push).toHaveBeenCalledWith({ pathname: '/report', params: { lat: '19.05', lon: '72.85' } });
+  });
+
+  it('says when a report has details waiting for a moderator', async () => {
+    withServer(
+      jest.fn().mockResolvedValue({
+        items: [incident({ isDemo: false, description: null, descriptionPending: true })],
+        truncated: false,
+      }),
+    );
+    await render(<MapScreen />);
+    await mapLoaded();
+    await act(async () => fake.source.onPress({ stopPropagation: jest.fn(), nativeEvent: { features: [{ properties: { id: 'i1' } }] } }));
+
+    expect(screen.getByText(/after a moderator has checked them/)).toBeOnTheScreen();
   });
 });
 

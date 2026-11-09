@@ -51,6 +51,13 @@ public class IncidentService {
                     "Reports must be about something that happened in the last 30 days.");
         }
 
+        String description = cleanDescription(request.description());
+        if (request.category() == IncidentCategory.OTHER && description == null) {
+            // "Other" on its own tells nobody anything.
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Details required",
+                    "Please describe what happened when you choose \"Other\".");
+        }
+
         // One report at a time per user, so two quick taps can't both slip under the limit.
         incidents.lockReporter(reporter.getId());
         if (incidents.countReportedSince(reporter.getId(), now.minus(Duration.ofHours(1))) >= maxPerHour
@@ -60,7 +67,7 @@ public class IncidentService {
         }
 
         UUID id = UUID.randomUUID();
-        incidents.insert(id, reporter.getId(), request, cleanDescription(request.description()));
+        incidents.insert(id, reporter.getId(), request, description);
         return incidents.findOwn(id).orElseThrow();
     }
 

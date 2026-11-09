@@ -66,9 +66,18 @@ describe('HomeScreen', () => {
     await render(<HomeScreen />);
     await screen.findByLabelText('Connected');
 
-    expect(screen.getByLabelText('Report incident, coming soon')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: /Report incident/ })).toBeNull();
+    expect(screen.getByLabelText('Trusted contacts, coming soon')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /Trusted contacts/ })).toBeNull();
     expect(screen.getByText(/In an emergency in India, call/)).toHaveTextContent(/112/);
+  });
+
+  it('opens the report form', async () => {
+    fakeAuth();
+    await render(<HomeScreen />);
+    await screen.findByLabelText('Connected');
+
+    await fireEvent.press(screen.getByRole('button', { name: /Report an incident/ }));
+    expect(router.push).toHaveBeenCalledWith('/report');
   });
 
   it('opens the safety map', async () => {
@@ -97,6 +106,14 @@ describe('ProfileScreen', () => {
     await fireEvent.press(screen.getByRole('button', { name: /Edit display name/ }));
     expect(router.push).toHaveBeenCalledWith('/edit-profile');
   });
+  
+    it('opens My reports', async () => {
+    fakeAuth();
+    await render(<ProfileScreen />);
+    await fireEvent.press(screen.getByRole('button', { name: /My reports/ }));
+    expect(router.push).toHaveBeenCalledWith('/my-reports');
+  });
+
 
   it('logs out', async () => {
     const auth = fakeAuth();

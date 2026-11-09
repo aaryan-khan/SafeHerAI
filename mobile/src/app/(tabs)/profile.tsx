@@ -65,6 +65,7 @@ export default function ProfileScreen() {
           ACCOUNT
         </Text>
         <ListItem icon="edit" title="Edit display name" subtitle="Change how your name appears" onPress={() => router.push('/edit-profile')} />
+        <ListItem icon="list_alt" title="My reports" subtitle="Check on or delete reports you sent" onPress={() => router.push('/my-reports')} />
         <ListItem icon="calendar_today" title="Member since" subtitle={formatDate(user.createdAt)} />
         <ListItem icon="refresh" title="Refresh profile" subtitle="Load the latest details from the server" onPress={onReload} />
       </Card>

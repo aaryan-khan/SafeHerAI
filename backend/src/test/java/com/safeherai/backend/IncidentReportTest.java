@@ -90,7 +90,7 @@ class IncidentReportTest extends IntegrationTest {
     void clientCannotMarkItsOwnReportVerifiedOrDemo() throws Exception {
         Area area = newArea();
         report(newUserToken(), """
-                {"category":"OTHER","latitude":%s,"longitude":%s,"occurredAt":"%s",
+                {"category":"HARASSMENT","latitude":%s,"longitude":%s,"occurredAt":"%s",
                  "verificationStatus":"VERIFIED","isDemo":true,"descriptionApproved":true}
                 """.formatted(area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
                 .andExpect(status().isCreated())
@@ -107,17 +107,23 @@ class IncidentReportTest extends IntegrationTest {
         // unknown category
         report(token, body("ALIENS", null, 10, 10, hoursAgo(1))).andExpect(status().isBadRequest());
         // impossible coordinates
-        report(token, body("OTHER", null, 95, 10, hoursAgo(1))).andExpect(status().isBadRequest());
-        report(token, body("OTHER", null, 10, 200, hoursAgo(1))).andExpect(status().isBadRequest());
+        report(token, body("HARASSMENT", null, 95, 10, hoursAgo(1))).andExpect(status().isBadRequest());
+        report(token, body("HARASSMENT", null, 10, 200, hoursAgo(1))).andExpect(status().isBadRequest());
         // description too long
         report(token, body("OTHER", "x".repeat(501), 10, 10, hoursAgo(1))).andExpect(status().isBadRequest());
         // in the future
-        report(token, body("OTHER", null, 10, 10, Instant.now().plus(1, ChronoUnit.HOURS)))
+        report(token, body("HARASSMENT", null, 10, 10, Instant.now().plus(1, ChronoUnit.HOURS)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("The time of the incident can't be in the future."));
         // too long ago
-        report(token, body("OTHER", null, 10, 10, Instant.now().minus(31, ChronoUnit.DAYS)))
+        report(token, body("HARASSMENT", null, 10, 10, Instant.now().minus(31, ChronoUnit.DAYS)))
                 .andExpect(status().isBadRequest());
+                
+        // "Other" needs a description (blank doesn't count)
+        report(token, body("OTHER", null, 10, 10, hoursAgo(1)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Details required"));
+        report(token, body("OTHER", "   ", 10, 10, hoursAgo(1))).andExpect(status().isBadRequest());
 
         // none of them was saved
         mockMvc.perform(get("/api/v1/incidents/mine").header("Authorization", "Bearer " + token))
@@ -127,7 +133,7 @@ class IncidentReportTest extends IntegrationTest {
     @Test
     void aFewMinutesOfPhoneClockDifferenceIsAccepted() throws Exception {
         Area area = newArea();
-        report(newUserToken(), body("OTHER", null, area.lat() + 0.05, area.lon() + 0.05,
+        report(newUserToken(), body("HARASSMENT", null, area.lat() + 0.05, area.lon() + 0.05,
                 Instant.now().plus(2, ChronoUnit.MINUTES)))
                 .andExpect(status().isCreated());
     }
@@ -138,22 +144,22 @@ class IncidentReportTest extends IntegrationTest {
         Area area = newArea();
         String firstId = null;
         for (int i = 0; i < 5; i++) {
-            String created = report(token, body("OTHER", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
+            String created = report(token, body("HARASSMENT", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
                     .andExpect(status().isCreated())
                     .andReturn().getResponse().getContentAsString();
             if (firstId == null) firstId = json(created, "$.id");
         }
-        report(token, body("OTHER", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
+        report(token, body("HARASSMENT", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.title").value("Too many reports"));
 
         mockMvc.perform(delete("/api/v1/incidents/" + firstId).header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
-        report(token, body("OTHER", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
+        report(token, body("HARASSMENT", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
                 .andExpect(status().isTooManyRequests());
 
         // Someone else is not affected.
-        report(newUserToken(), body("OTHER", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
+        report(newUserToken(), body("HARASSMENT", null, area.lat() + 0.05, area.lon() + 0.05, hoursAgo(1)))
                 .andExpect(status().isCreated());
     }
 

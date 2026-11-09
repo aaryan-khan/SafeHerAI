@@ -43,7 +43,7 @@ export function TextField({
       <Text variant="label" color="textMuted">
         {label}
       </Text>
-      <View style={[styles.box, { borderColor }, focused && styles.boxFocused]}>
+      <View style={[styles.box, { borderColor }, focused && styles.boxFocused, inputProps.multiline && styles.boxMultiline]}>
         {icon ? <Icon name={icon} size={20} color={focused ? colors.primary : colors.textSubtle} /> : null}
         <TextInput
           ref={ref}
@@ -62,7 +62,7 @@ export function TextField({
             setFocused(false);
             onBlur?.(e);
           }}
-          style={styles.input}
+          style={[styles.input, inputProps.multiline && styles.inputMultiline]}
           {...inputProps}
         />
         {success && !error ? <Icon name="check_circle" size={20} color={colors.success} /> : null}
@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceGlass,
   },
   boxFocused: { backgroundColor: colors.primarySoft },
+  boxMultiline: { alignItems: 'flex-start', paddingTop: spacing.xs },
   input: {
     flex: 1,
     minHeight: layout.minTouchTarget,
@@ -114,6 +115,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: spacing.sm,
   },
+  // Several lines: a taller box, text starting at the top (Android centres it otherwise).
+  inputMultiline: { minHeight: 112, textAlignVertical: 'top' },
   toggle: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
   messageRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   errorText: { color: colors.danger, flex: 1 },

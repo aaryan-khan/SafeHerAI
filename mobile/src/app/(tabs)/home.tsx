@@ -10,7 +10,6 @@ import { Avatar, Card, Icon, Screen, Skeleton, StatusPill, Text, theme, type Ico
 
 /** Features that are planned but not built yet. Shown clearly as "Coming soon" and not tappable. */
 const UPCOMING: { icon: IconName; title: string }[] = [
-  { icon: 'report', title: 'Report incident' },
   { icon: 'group', title: 'Trusted contacts' },
   { icon: 'directions_walk', title: 'Safe Walk' },
 ];
@@ -85,23 +84,19 @@ export default function HomeScreen() {
         </Card>
       </Animated.View>
 
-      <Animated.View entering={enter(2)}>
-        <Pressable
+      <Animated.View entering={enter(2)} style={styles.actions}>
+        <ActionCard
+          icon="map"
+          title="Safety map"
+          subtitle="See community reports around you"
           onPress={() => router.push('/map')}
-          accessibilityRole="button"
-          accessibilityLabel="Safety map. See community reports around you"
-          style={({ pressed }) => [styles.mapCard, pressed && styles.pressed]}>
-          <View style={styles.mapIcon}>
-            <Icon name="map" size={26} color={theme.colors.primary} />
-          </View>
-          <View style={styles.flex}>
-            <Text variant="bodyStrong">Safety map</Text>
-            <Text variant="label" color="textMuted">
-              See community reports around you
-            </Text>
-          </View>
-          <Icon name="chevron_right" size={24} color={theme.colors.textSubtle} />
-        </Pressable>
+        />
+        <ActionCard
+          icon="add_location_alt"
+          title="Report an incident"
+          subtitle="Help others know what to watch out for"
+          onPress={() => router.push('/report')}
+        />
       </Animated.View>
 
       <Animated.View entering={enter(3)} style={styles.section}>
@@ -150,7 +145,30 @@ export default function HomeScreen() {
   );
 }
 
+/** A large tappable row for a feature that works today. */
+function ActionCard({ icon, title, subtitle, onPress }: { icon: IconName; title: string; subtitle: string; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${title}. ${subtitle}`}
+      style={({ pressed }) => [styles.mapCard, pressed && styles.pressed]}>
+      <View style={styles.mapIcon}>
+        <Icon name={icon} size={26} color={theme.colors.primary} />
+      </View>
+      <View style={styles.flex}>
+        <Text variant="bodyStrong">{title}</Text>
+        <Text variant="label" color="textMuted">
+          {subtitle}
+        </Text>
+      </View>
+      <Icon name="chevron_right" size={24} color={theme.colors.textSubtle} />
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
+  actions: { gap: theme.spacing.sm },
   header: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md, marginTop: theme.spacing.xs },
   flex: { flex: 1 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, minHeight: 32 },

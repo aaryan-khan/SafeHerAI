@@ -10,6 +10,7 @@ import {
   type ViewStateChangeEvent,
 } from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
@@ -101,6 +102,21 @@ export default function MapScreen() {
     },
     [],
   );
+
+  // Coming back to this tab (e.g. after sending a report): reload, so new reports appear.
+  const focusedBefore = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (focusedBefore.current) reloadVisibleArea();
+      focusedBefore.current = true;
+    }, [reloadVisibleArea]),
+  );
+
+  /** Opens the report form at the spot in the middle of the map. */
+  async function onReport() {
+    const center = await mapRef.current?.getCenter();
+    router.push(center ? { pathname: '/report', params: { lat: String(center[1]), lon: String(center[0]) } } : '/report');
+  }
 
   // ---------- The user's location (only while the app is open) ----------
 
@@ -266,7 +282,17 @@ export default function MapScreen() {
 
       {/* ---------- Bottom: location button, then the selected incident or the 112 note ---------- */}
       <View style={styles.bottomArea} pointerEvents="box-none">
-        <View style={styles.fabRow} pointerEvents="box-none">
+      <View style={styles.fabRow} pointerEvents="box-none">
+                    <Pressable
+            onPress={onReport}
+            accessibilityRole="button"
+            accessibilityLabel="Report an incident here"
+            style={({ pressed }) => [styles.reportButton, pressed && styles.fabPressed]}>
+            <Icon name="add_location_alt" size={22} color={theme.colors.textOnPrimary} />
+            <Text variant="label" style={styles.reportLabel}>
+              Report
+            </Text>
+          </Pressable>
           <RoundButton
             icon={permission === 'granted' ? 'my_location' : 'location_searching'}
             label={permission === 'granted' ? 'Center the map on my location' : 'Show my location on the map'}
@@ -380,6 +406,11 @@ function IncidentCard({ incident, onClose }: { incident: Incident; onClose: () =
         {incident.isDemo ? <StatusPill label="DEMO" tone="warning" /> : null}
       </View>
       {incident.description ? <Text variant="body">{incident.description}</Text> : null}
+      {incident.descriptionPending ? (
+        <Text variant="caption" color="textMuted">
+          The reporter added details. They will show here after a moderator has checked them.
+        </Text>
+      ) : null}
       {!verified ? (
         <Text variant="caption" color="textSubtle">
           Not yet checked by a moderator.
@@ -430,7 +461,18 @@ const styles = StyleSheet.create({
   dotVerified: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#FFFFFF' },
   // Leaves a strip at the very bottom for the map's attribution (i) button.
   bottomArea: { position: 'absolute', left: theme.spacing.md, right: theme.spacing.md, bottom: 40, gap: theme.spacing.xs },
-  fabRow: { flexDirection: 'row', justifyContent: 'flex-end' },
+  fabRow: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: theme.spacing.sm },
+  reportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    height: theme.layout.minTouchTarget + 4,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.radii.pill,
+    backgroundColor: theme.colors.primary,
+    ...theme.shadows.glow,
+  },
+  reportLabel: { color: theme.colors.textOnPrimary, fontFamily: theme.fonts.semibold },
   fab: {
     ...panel,
     width: theme.layout.minTouchTarget + 4,

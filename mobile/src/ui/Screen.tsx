@@ -10,6 +10,8 @@ type ScreenProps = {
   /** Wrap the content in a ScrollView (forms and long pages). Default true. */
   scroll?: boolean;
   /** Centre the content vertically (welcome-style pages). */
+  /** Temporarily stop the page scrolling, e.g. while a finger is on a map inside it. Default true. */
+  scrollEnabled?: boolean;
   centered?: boolean;
   /** Which edges get safe-area padding. Screens under a header usually skip 'top'. */
   edges?: Edge[];
@@ -20,7 +22,7 @@ type ScreenProps = {
  * The background and frame for every screen: midnight gradient, safe areas (notch,
  * gesture bar), keyboard handling, and a maximum width so tablets don't stretch content.
  */
-export function Screen({ children, scroll = true, centered = false, edges = ['top', 'bottom'], contentStyle }: ScreenProps) {
+export function Screen({ children, scroll = true, scrollEnabled = true, centered = false, edges = ['top', 'bottom'], contentStyle }: ScreenProps) {
   const inner = [styles.content, centered && styles.centered, contentStyle];
 
   return (
@@ -31,6 +33,8 @@ export function Screen({ children, scroll = true, centered = false, edges = ['to
         <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           {scroll ? (
             <ScrollView
+              scrollEnabled={scrollEnabled}
+              testID="screen-scroll"
               contentContainerStyle={[styles.scrollContent, centered && styles.grow]}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}>

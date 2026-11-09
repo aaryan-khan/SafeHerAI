@@ -73,6 +73,8 @@ function RootNavigator() {
       <Stack.Protected guard={signedIn} redirectTo="/">
         <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
         <Stack.Screen name="edit-profile" />
+        <Stack.Screen name="report" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="my-reports" />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn} redirectTo="/home">
         <Stack.Screen name="index" options={{ animation: 'fade' }} />

@@ -1,11 +1,12 @@
 import { createApiClient, type TokenStore } from '@/api/client';
-import { areaFromBounds, incidentsPath, isAreaTooLarge, type Incident } from '@/api/incidents';
+import { areaFromBounds, incidentsPath, isAreaTooLarge, occurredAtFor, type Incident } from '@/api/incidents';
 import { reportCountLabel, timeAgo, toFeatureCollection } from '@/map/mapData';
 
 const INCIDENT: Incident = {
   id: 'i1',
   category: 'POOR_LIGHTING',
   description: 'DEMO: made-up report',
+  descriptionPending: false,
   latitude: 19.07,
   longitude: 72.88,
   occurredAt: '2026-11-01T10:00:00Z',
@@ -81,5 +82,57 @@ describe('api client: incidents', () => {
       'http://test-server:8080/api/v1/incidents?minLon=72.80000&minLat=19.00000&maxLon=72.90000&maxLat=19.10000',
     );
     expect((last.init.headers as Record<string, string>).Authorization).toBe('Bearer access-1');
+  });
+});
+
+
+describe('report times', () => {
+  it('turns "when" choices into approximate times', () => {
+    const now = new Date('2026-11-04T12:00:00Z');
+    expect(occurredAtFor('now', now)).toBe('2026-11-04T12:00:00.000Z');
+    expect(occurredAtFor('fewHours', now)).toBe('2026-11-04T09:00:00.000Z');
+    expect(occurredAtFor('yesterday', now)).toBe('2026-11-03T12:00:00.000Z');
+  });
+});
+
+describe('api client: own reports', () => {
+  function client(respond: (url: string, init: RequestInit) => { status: number; body?: unknown }) {
+    const calls: { url: string; init: RequestInit }[] = [];
+    const store: TokenStore = { getRefreshToken: async () => 'r', setRefreshToken: async () => {}, clear: async () => {} };
+    const fetchImpl = (async (url: string, init: RequestInit) => {
+      calls.push({ url, init });
+      const answer = url.includes('/auth/refresh')
+        ? { status: 200, body: { tokenType: 'Bearer', accessToken: 'a', expiresIn: 900, refreshToken: 'r2', user: {} } }
+        : respond(url, init);
+      const text = answer.body === undefined ? '' : JSON.stringify(answer.body);
+      return { ok: answer.status < 300, status: answer.status, text: async () => text } as Response;
+    }) as unknown as typeof fetch;
+    return { calls, api: createApiClient({ baseUrl: 'http://s', tokenStore: store, fetchImpl }) };
+  }
+
+  it('sends a report as JSON and lists and deletes own reports', async () => {
+    const { calls, api } = client((url, init) =>
+      init.method === 'POST'
+        ? { status: 201, body: { id: 'n1' } }
+        : init.method === 'DELETE'
+          ? { status: 204 }
+          : { status: 200, body: { items: [{ id: 'n1' }] } },
+    );
+
+    await api.reportIncident({ category: 'OTHER', latitude: 19, longitude: 72.8, occurredAt: '2026-11-04T12:00:00Z' });
+    const post = calls[calls.length - 1];
+    expect(post.url).toBe('http://s/api/v1/incidents');
+    expect(JSON.parse(post.init.body as string)).toEqual({
+      category: 'OTHER',
+      latitude: 19,
+      longitude: 72.8,
+      occurredAt: '2026-11-04T12:00:00Z',
+    });
+
+    await expect(api.myIncidents()).resolves.toEqual([{ id: 'n1' }]);
+    expect(calls[calls.length - 1].url).toBe('http://s/api/v1/incidents/mine');
+
+    await expect(api.deleteIncident('n1')).resolves.toBeUndefined();
+    expect(calls[calls.length - 1]).toMatchObject({ url: 'http://s/api/v1/incidents/n1', init: { method: 'DELETE' } });
   });
 });

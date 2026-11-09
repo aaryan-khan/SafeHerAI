@@ -32,6 +32,8 @@ const routes = {
   connection: () => <Text>CONNECTION</Text>,
   gallery: () => <Text>GALLERY</Text>,
   'edit-profile': () => <Text>EDIT PROFILE</Text>,
+  report: () => <Text>REPORT</Text>,
+  'my-reports': () => <Text>MY REPORTS</Text>,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/home': () => <Text>HOME</Text>,
   '(tabs)/map': () => <Text>MAP</Text>,
@@ -58,10 +60,12 @@ describe('navigation between logged-out and logged-in screens', () => {
     expect(screen.getByText('WELCOME')).toBeOnTheScreen();
   });
 
-  it('never shows the map to a logged-out user', async () => {
-    await renderRouter(routes, { initialUrl: '/map' });
-    expect(screen.queryByText('MAP')).toBeNull();
-    expect(screen.getByText('WELCOME')).toBeOnTheScreen();
+    it('never shows the map or reporting screens to a logged-out user', async () => {
+    for (const url of ['/map', '/report', '/my-reports']) {
+      await renderRouter(routes, { initialUrl: url });
+      expect(screen.queryByText(/^(MAP|REPORT|MY REPORTS)$/)).toBeNull();
+      expect(screen.getByText('WELCOME')).toBeOnTheScreen();
+    }
   });
 
   it('shows the offline screen instead of navigation when the server is unreachable', async () => {

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ApiError, createApiClient, type User } from '@/api/client';
-import type { IncidentPage, MapArea } from '@/api/incidents';
+import type { IncidentPage, MapArea, NewReport, OwnIncident } from '@/api/incidents';
 import { secureTokenStore } from '@/auth/tokenStorage';
 import { API_URL } from '@/config/env';
 
@@ -26,6 +26,9 @@ type AuthContextValue = {
   retry(): Promise<void>;
   /** Logged-in API calls live here because they share the session's tokens. */
   incidentsInArea(area: MapArea): Promise<IncidentPage>;
+  reportIncident(report: NewReport): Promise<OwnIncident>;
+  myIncidents(): Promise<OwnIncident[]>;
+  deleteIncident(id: string): Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -90,6 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       retry: restore,
       incidentsInArea: (area) => api.incidentsInArea(area),
+      reportIncident: (report) => api.reportIncident(report),
+      myIncidents: () => api.myIncidents(),
+      deleteIncident: (id) => api.deleteIncident(id),
     }),
     [api, restore, state],
   );

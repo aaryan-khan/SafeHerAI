@@ -1,4 +1,4 @@
-import { incidentsPath, type IncidentPage, type MapArea } from './incidents';
+import { incidentsPath, type IncidentPage, type MapArea, type NewReport, type OwnIncident } from './incidents';
 /**
  * Talks to the SafeHerAI backend.
  *
@@ -191,6 +191,17 @@ export function createApiClient({
     /** Incidents inside a rectangle of map, newest first (at most 300). */
     incidentsInArea(area: MapArea): Promise<IncidentPage> {
       return authed<IncidentPage>(incidentsPath(area));
+    },
+     reportIncident(report: NewReport): Promise<OwnIncident> {
+      return authed<OwnIncident>('/api/v1/incidents', { method: 'POST', body: report });
+    },
+
+    async myIncidents(): Promise<OwnIncident[]> {
+      return (await authed<{ items: OwnIncident[] }>('/api/v1/incidents/mine')).items;
+    },
+
+    async deleteIncident(id: string): Promise<void> {
+      await authed<void>(`/api/v1/incidents/${encodeURIComponent(id)}`, { method: 'DELETE' });
     },
     
     /**
